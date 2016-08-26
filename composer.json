@@ -1,0 +1,26 @@
+{
+  "name": "welhott/bencode",
+  "type": "library",
+  "description": "Library to handle Bencoded files.",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ricardo Velhote",
+      "email": "rvelhote+github@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Welhott\\Bencode\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Welhott\\Bencode\\": "tests/"
+    }
+  },
+  "require": {
+    "ext-mbstring": "*"
+  }
+}
