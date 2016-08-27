@@ -27,6 +27,7 @@ namespace Welhott\Bencode\DataType;
 use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
+use Traversable;
 
 /**
  * Class BencodedList
@@ -73,7 +74,7 @@ class BencodedList implements BencodedDataType, ArrayAccess, IteratorAggregate
      * <b>Traversable</b>
      * @since 5.0.0
      */
-    public function getIterator() : ArrayIterator
+    public function getIterator() : Traversable
     {
         return new ArrayIterator($this->value);
     }

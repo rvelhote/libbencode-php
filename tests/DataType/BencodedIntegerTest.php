@@ -39,8 +39,8 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
      */
     public function testInteger()
     {
-        for($i = -1; $i < 1; $i++) {
-            $bencoded = new Bencode('i'.$i.'e');
+        for ($i = -1; $i < 1; $i++) {
+            $bencoded = new Bencode('i' . $i . 'e');
             $this->assertEquals($i, $bencoded->decode()->getValue());
         }
     }
@@ -62,7 +62,7 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
         $time1 = time();
         $time2 = time() * time();
 
-        $bencoded = new Bencode('i'.$time1.'ei'.$time2.'e');
+        $bencoded = new Bencode('i' . $time1 . 'ei' . $time2 . 'e');
         $this->assertEquals([new BencodedInteger($time1), new BencodedInteger($time2)], $bencoded->decode());
     }
 }

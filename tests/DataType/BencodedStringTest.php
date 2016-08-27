@@ -26,6 +26,7 @@ namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
 use Welhott\Bencode\Bencode;
+use Welhott\Bencode\DataType\BencodedDataType;
 
 /**
  * Class BencodedStringTest
@@ -42,8 +43,8 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
 
     public function testSingleByteString()
     {
-        foreach(self::$strings as $string) {
-            $bencoded = new Bencode(mb_strlen($string).':'.$string);
+        foreach (self::$strings as $string) {
+            $bencoded = new Bencode(mb_strlen($string) . ':' . $string);
             $this->assertEquals($string, $bencoded->decode()->getValue());
         }
     }
@@ -51,8 +52,8 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
     public function testMultipleByteStrings()
     {
         $concatenated = '';
-        foreach(self::$strings as $string) {
-            $concatenated .= mb_strlen($string).':'.$string;
+        foreach (self::$strings as $string) {
+            $concatenated .= mb_strlen($string) . ':' . $string;
         }
 
         $bencoded = new Bencode($concatenated);
@@ -60,7 +61,8 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_array($bencodedData));
 
-        foreach($bencodedData as $i => $data) {
+        /** @var BencodedDataType $data */
+        foreach ($bencodedData as $i => $data) {
             $this->assertEquals(self::$strings[$i], $data->getValue());
         }
     }

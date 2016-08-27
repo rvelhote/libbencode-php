@@ -82,7 +82,7 @@ class Bencode
     {
         $data = [];
 
-        while($this->position < mb_strlen($this->bencoded)) {
+        while ($this->position < mb_strlen($this->bencoded)) {
             $data[] = $this->recursive();
         }
 
@@ -129,8 +129,8 @@ class Bencode
 
         $this->position++;
 
-        while($this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER) {
-            if($zebra % 2 == 0) {
+        while ($this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER) {
+            if ($zebra % 2 == 0) {
                 $key = $this->recursive()->getValue();
             } else {
                 $data[$key] = $this->recursive();
@@ -150,7 +150,7 @@ class Bencode
         $this->position++;
         $list = [];
 
-        while($this->bencoded[$this->position] != BencodedList::END_DELIMITER) {
+        while ($this->bencoded[$this->position] != BencodedList::END_DELIMITER) {
             $list[] = $this->recursive();
         }
 

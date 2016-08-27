@@ -27,7 +27,6 @@ namespace Welhott\Bencode\Tests\DataType;
 use PHPUnit_Framework_TestCase;
 use Welhott\Bencode\Bencode;
 use Welhott\Bencode\DataType\BencodedInteger;
-use Welhott\Bencode\DataType\BencodedString;
 
 /**
  * Class BencodedDictionaryTest

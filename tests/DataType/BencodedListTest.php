@@ -48,7 +48,7 @@ class BencodedListTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $decoded->getValue());
 
-        foreach($decoded as $index => $d) {
+        foreach ($decoded as $index => $d) {
             $this->assertEquals($expected[$index], $decoded[$index]);
         }
     }
