@@ -24,6 +24,8 @@
  */
 namespace Welhott\Bencode\DataType;
 
+use DateTime;
+
 /**
  * Class BencodedInteger
  * @package Welhott\Bencode\DataType
@@ -55,10 +57,36 @@ class BencodedInteger implements BencodedDataType
     }
 
     /**
-     * @return int
+     * The integer value of this object.
+     * @return int An integer.
      */
     public function getValue() : int
     {
         return $this->value;
+    }
+
+    /**
+     * Obtains this integer value as a DateTime object. Dates in Bencoded strings are stored as unix timestamps.
+     * @return DateTime A DateTime object representation of the a date.
+     */
+    public function getDate() : DateTime
+    {
+        return new DateTime($this->value);
+    }
+
+    /**
+     * Returns the current integer as a human-readable size. This is for usage in dictionary values that represent
+     * filesizes. We cannot determine these so we trust the developer to invoke the correct method.
+     *
+     * @param int $decimals The number of decimal places that the human-readable string should have.
+     * @return string A human-readable size of this integer (which should represent a filezise).
+     *
+     * @see http://jeffreysambells.com/2012/10/25/human-readable-filesize-php
+     */
+    public function getHumanFilesize(int $decimals = 2) : string
+    {
+        $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+        $factor = floor((strlen($this->value) - 1) / 3);
+        return sprintf("%.{$decimals}f", $this->value / pow(1024, $factor)) . $size[$factor];
     }
 }
