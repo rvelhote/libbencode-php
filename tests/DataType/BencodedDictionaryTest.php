@@ -22,39 +22,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace Welhott\Bencode\Tests;
+namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
 use Welhott\Bencode\Bencode;
 use Welhott\Bencode\DataType\BencodedInteger;
+use Welhott\Bencode\DataType\BencodedString;
 
-class BencodeTest extends PHPUnit_Framework_TestCase
+/**
+ * Class BencodedDictionaryTest
+ * @package Welhott\Bencode\Tests\DataType
+ */
+class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
 {
+    public function testDictionary()
+    {
+        $expected = [
+            'pretzels' => new BencodedInteger(-100)
+        ];
 
-
-    /**
-     *
-     */
-//    public function testInteger()
-//    {
-//        for($i = -1; $i < 1; $i++) {
-//            $bencoded = new Bencode('i'.$i.'e');
-//            $this->assertEquals($i, $bencoded->decode()->getValue());
-//        }
-//    }
-
-//    public function testMultipleIntegers()
-//    {
-//        $bencoded = new Bencode('i-1ei1e');
-//        $this->assertEquals([-1, 1], $bencoded->decode());
-//
-//        $time1 = time();
-//        $time2 = time() * time();
-//        $bencoded = new Bencode('i'.$time1.'ei'.$time2.'e');
-//
-//        $this->assertEquals([$time1, $time2], $bencoded->decode());
-//    }
-//
-
-
+        $bencoded = new Bencode('d8:pretzelsi-100ei1ee');
+        $this->assertEquals($expected, $bencoded->decode()->getValue());
+    }
 }

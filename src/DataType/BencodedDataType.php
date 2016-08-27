@@ -22,39 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace Welhott\Bencode\Tests;
+namespace Welhott\Bencode\DataType;
 
-use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Bencode;
-use Welhott\Bencode\DataType\BencodedInteger;
-
-class BencodeTest extends PHPUnit_Framework_TestCase
+interface BencodedDataType
 {
-
-
-    /**
-     *
-     */
-//    public function testInteger()
-//    {
-//        for($i = -1; $i < 1; $i++) {
-//            $bencoded = new Bencode('i'.$i.'e');
-//            $this->assertEquals($i, $bencoded->decode()->getValue());
-//        }
-//    }
-
-//    public function testMultipleIntegers()
-//    {
-//        $bencoded = new Bencode('i-1ei1e');
-//        $this->assertEquals([-1, 1], $bencoded->decode());
-//
-//        $time1 = time();
-//        $time2 = time() * time();
-//        $bencoded = new Bencode('i'.$time1.'ei'.$time2.'e');
-//
-//        $this->assertEquals([$time1, $time2], $bencoded->decode());
-//    }
-//
-
-
+    public function getValue();
 }

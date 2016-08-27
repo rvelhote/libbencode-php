@@ -22,39 +22,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace Welhott\Bencode\Tests;
+namespace Welhott\Bencode\DataType;
 
-use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Bencode;
-use Welhott\Bencode\DataType\BencodedInteger;
-
-class BencodeTest extends PHPUnit_Framework_TestCase
+/**
+ * Class BencodedInteger
+ * @package Welhott\Bencode\DataType
+ */
+class BencodedInteger implements BencodedDataType
 {
-
+    /**
+     *
+     */
+    const START_DELIMITER = 'i';
 
     /**
      *
      */
-//    public function testInteger()
-//    {
-//        for($i = -1; $i < 1; $i++) {
-//            $bencoded = new Bencode('i'.$i.'e');
-//            $this->assertEquals($i, $bencoded->decode()->getValue());
-//        }
-//    }
+    const END_DELIMITER = 'e';
 
-//    public function testMultipleIntegers()
-//    {
-//        $bencoded = new Bencode('i-1ei1e');
-//        $this->assertEquals([-1, 1], $bencoded->decode());
-//
-//        $time1 = time();
-//        $time2 = time() * time();
-//        $bencoded = new Bencode('i'.$time1.'ei'.$time2.'e');
-//
-//        $this->assertEquals([$time1, $time2], $bencoded->decode());
-//    }
-//
+    /**
+     * @var int
+     */
+    private $value;
 
+    /**
+     * BencodedInteger constructor.
+     * @param int $value
+     */
+    public function __construct(int $value)
+    {
+        $this->value = $value;
+    }
 
+    /**
+     * @return int
+     */
+    public function getValue() : int
+    {
+        return $this->value;
+    }
 }

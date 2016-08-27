@@ -22,39 +22,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace Welhott\Bencode\Tests;
+namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
 use Welhott\Bencode\Bencode;
-use Welhott\Bencode\DataType\BencodedInteger;
 
-class BencodeTest extends PHPUnit_Framework_TestCase
+/**
+ * Class BencodedStringTest
+ * @package Welhott\Bencode\Tests\DataType
+ */
+class BencodedStringTest extends PHPUnit_Framework_TestCase
 {
+    private static $strings = [
+        'these pretzels are making me thirsty',
+        'and you wanna be my latex salesman?',
+        'i am speechless; i am without speech',
+        'another babka?'
+    ];
 
+    public function testSingleByteString()
+    {
+        foreach(self::$strings as $string) {
+            $bencoded = new Bencode(mb_strlen($string).':'.$string);
+            $this->assertEquals($string, $bencoded->decode()->getValue());
+        }
+    }
 
-    /**
-     *
-     */
-//    public function testInteger()
-//    {
-//        for($i = -1; $i < 1; $i++) {
-//            $bencoded = new Bencode('i'.$i.'e');
-//            $this->assertEquals($i, $bencoded->decode()->getValue());
-//        }
-//    }
+    public function testMultipleByteStrings()
+    {
+        $concatenated = '';
+        foreach(self::$strings as $string) {
+            $concatenated .= mb_strlen($string).':'.$string;
+        }
 
-//    public function testMultipleIntegers()
-//    {
-//        $bencoded = new Bencode('i-1ei1e');
-//        $this->assertEquals([-1, 1], $bencoded->decode());
-//
-//        $time1 = time();
-//        $time2 = time() * time();
-//        $bencoded = new Bencode('i'.$time1.'ei'.$time2.'e');
-//
-//        $this->assertEquals([$time1, $time2], $bencoded->decode());
-//    }
-//
+        $bencoded = new Bencode($concatenated);
+        $bencodedData = $bencoded->decode();
 
+        $this->assertTrue(is_array($bencodedData));
 
+        foreach($bencodedData as $i => $data) {
+            $this->assertEquals(self::$strings[$i], $data->getValue());
+        }
+    }
 }

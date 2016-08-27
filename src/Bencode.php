@@ -1,8 +1,39 @@
 <?php
-
+/**
+ * MIT License
+ *
+ * Copyright (c) 2016 Ricardo Velhote
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 namespace Welhott\Bencode;
 
+use Welhott\Bencode\DataType\BencodedDataType;
+use Welhott\Bencode\DataType\BencodedDictionary;
+use Welhott\Bencode\DataType\BencodedInteger;
+use Welhott\Bencode\DataType\BencodedList;
+use Welhott\Bencode\DataType\BencodedString;
 
+/**
+ * Class Bencode
+ * @package Welhott\Bencode
+ */
 class Bencode
 {
     /**
@@ -10,40 +41,44 @@ class Bencode
      */
     private $bencoded = '';
 
+    /**
+     * @var int
+     */
     private $position = 0;
 
+    /**
+     * Bencode constructor.
+     * @param string $bencoded
+     */
     public function __construct(string $bencoded)
     {
         $this->bencoded = $bencoded;
     }
 
-    private function recursive()
+    /**
+     * @return BencodedDataType
+     */
+    private function recursive() : BencodedDataType
     {
         switch ($this->bencoded[$this->position]) {
-            case 'd': {
-                $this->move();
+            case BencodedDictionary::START_DELIMITER: {
                 return $this->readDictionary();
             }
 
-            case 'l':
-                $this->move();
+            case BencodedList::START_DELIMITER:
                 return $this->readList();
 
-            case 'i': {
-                $this->move();
+            case BencodedInteger::START_DELIMITER: {
                 return $this->readInteger();
-
             }
 
             default: {
-                return $this->readByteString();
+                return $this->readString();
             }
-
         }
-
     }
 
-    public function decode() : array
+    public function decode()
     {
         $data = [];
 
@@ -51,72 +86,75 @@ class Bencode
             $data[] = $this->recursive();
         }
 
-        return $data;
+        return count($data) == 1 ? reset($data) : $data;
     }
 
-    public function move(int $length = 1)
+    /**
+     * @return BencodedInteger
+     */
+    private function readInteger() : BencodedInteger
     {
-        $this->position += $length;
+        $this->position++;
+
+        $token = mb_strpos($this->bencoded, BencodedInteger::END_DELIMITER, $this->position);
+        $string = mb_substr($this->bencoded, $this->position, $token - $this->position);
+
+        $this->position = $token + 1;
+        return new BencodedInteger($string);
     }
 
-    private function readDictionary() : array
+    /**
+     * @return BencodedString
+     */
+    private function readString() : BencodedString
+    {
+        $token = mb_strpos($this->bencoded, BencodedString::END_DELIMITER, $this->position);
+        $length = mb_substr($this->bencoded, $this->position, $token - $this->position);
+
+        $token++;
+        $this->position = $length + $token;
+
+        $string = mb_substr($this->bencoded, $token, $length);
+        return new BencodedString($string);
+    }
+
+    /**
+     * @return BencodedDictionary
+     */
+    private function readDictionary() : BencodedDictionary
     {
         $data = [];
         $zebra = 0;
         $key = '';
 
-        while($this->bencoded[$this->position] != 'e') {
+        $this->position++;
+
+        while($this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER) {
             if($zebra % 2 == 0) {
-                $key = $this->recursive();
+                $key = $this->recursive()->getValue();
             } else {
                 $data[$key] = $this->recursive();
             }
             $zebra++;
         }
 
-        $this->move();
-        return $data;
+        $this->position++;
+        return new BencodedDictionary($data);
     }
 
     /**
-     * @return int
+     * @return BencodedList
      */
-    private function readInteger() : int
+    private function readList() : BencodedList
     {
-        $token = mb_strpos($this->bencoded, "e", $this->position);
-        $string = mb_substr($this->bencoded, $this->position, $token - $this->position);
-
-        $this->move($token - $this->position + 1);
-        return intval($string);
-    }
-
-    /**
-     * @return string
-     */
-    private function readByteString() : string
-    {
-        $token = mb_strpos($this->bencoded, ":", $this->position);
-        $length = mb_substr($this->bencoded, $this->position, $token - $this->position);
-
-        $token++;
-        $string = mb_substr($this->bencoded, $token, $length);
-
-        $this->move($length - $this->position + $token);
-        return $string;
-    }
-
-    /**
-     * @return array
-     */
-    private function readList() : array
-    {
+        $this->position++;
         $list = [];
 
-        while($this->bencoded[$this->position] != 'e') {
+        while($this->bencoded[$this->position] != BencodedList::END_DELIMITER) {
             $list[] = $this->recursive();
         }
 
-        $this->move();
-        return $list;
+        $this->position++;
+        return new BencodedList($list);
     }
 }
