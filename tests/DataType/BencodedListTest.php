@@ -42,7 +42,14 @@ class BencodedListTest extends PHPUnit_Framework_TestCase
             new BencodedInteger(1),
             new BencodedString('pretzels')
         ];
+
         $bencoded = new Bencode('li-100ei1e8:pretzelse');
-        $this->assertEquals($expected, $bencoded->decode()->getValue());
+        $decoded = $bencoded->decode();
+
+        $this->assertEquals($expected, $decoded->getValue());
+
+        foreach($decoded as $index => $d) {
+            $this->assertEquals($expected[$index], $decoded[$index]);
+        }
     }
 }

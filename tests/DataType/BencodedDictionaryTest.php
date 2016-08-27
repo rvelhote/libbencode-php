@@ -42,6 +42,12 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
         ];
 
         $bencoded = new Bencode('d8:pretzelsi-100ei1ee');
-        $this->assertEquals($expected, $bencoded->decode()->getValue());
+        $decoded = $bencoded->decode();
+
+        $this->assertEquals($expected, $decoded->getValue());
+        $this->assertEquals($expected['pretzels'], $decoded['pretzels']);
+
+        $this->assertTrue(isset($decoded['pretzels']));
+        $this->assertFalse(isset($decoded['unset pretzels']));
     }
 }
