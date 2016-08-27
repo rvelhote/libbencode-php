@@ -37,26 +37,62 @@ use Welhott\Bencode\DataType\BencodedString;
 class Bencode
 {
     /**
+     * The string/file contents of what we want to decode.
      * @var string
      */
     private $bencoded = '';
 
     /**
+     * The current position of the pointer. Position points to a single char in $this->bencoded. That single char will
+     * either mean that we have a Dictionary, List, Integer or String data type that we must do something with.
      * @var int
      */
     private $position = 0;
 
     /**
+     * The length of $this->bencoded.
+     * This is mostly just to avoid repeated calls in decode() function to mb_strlen().
+     * @var int
+     */
+    private $length = 0;
+
+    /**
      * Bencode constructor.
-     * @param string $bencoded
+     * @param string $bencoded The Bencoded string that we want to decode.
      */
     public function __construct(string $bencoded)
     {
         $this->bencoded = $bencoded;
+        $this->length = mb_strlen($this->bencoded);
     }
 
     /**
-     * @return BencodedDataType
+     * Parses/Decoded the bencoded string in this object into objects.
+     *
+     * This method calls recursive() sucessively after it returns until there are no more chars to process and will
+     * return an array of objects of various data types or a single data type (in case there is only one item in the
+     * bencoded string).
+     *
+     * Since the Bencode format is only (that I know of) used in torrent files the first element will always be a
+     * dictionary of values so, technically, we could always return a dictionary and avoid having the recursive()
+     * method. However I would prefer to have this more flexible.
+     *
+     * @return array|mixed An array of objects of all the discovered data types or a single object with a data type.
+     */
+    public function decode()
+    {
+        $data = [];
+
+        while ($this->position < $this->length) {
+            $data[] = $this->recursive();
+        }
+
+        return count($data) == 1 ? reset($data) : $data;
+    }
+
+    /**
+     * Processes each char in the Bencoded string and matches it with the correct data type.
+     * @return BencodedDataType An object with the matched data type (Dictionary, List, Integer or String).
      */
     private function recursive() : BencodedDataType
     {
@@ -65,8 +101,9 @@ class Bencode
                 return $this->readDictionary();
             }
 
-            case BencodedList::START_DELIMITER:
+            case BencodedList::START_DELIMITER: {
                 return $this->readList();
+            }
 
             case BencodedInteger::START_DELIMITER: {
                 return $this->readInteger();
@@ -78,19 +115,20 @@ class Bencode
         }
     }
 
-    public function decode()
-    {
-        $data = [];
-
-        while ($this->position < mb_strlen($this->bencoded)) {
-            $data[] = $this->recursive();
-        }
-
-        return count($data) == 1 ? reset($data) : $data;
-    }
-
     /**
-     * @return BencodedInteger
+     * Process an integer.
+     *
+     * The format of an integer data type is: i[NUMBER]e
+     *
+     * i » Starting Delimiter
+     * [NUMBER] » The value of the integer (can be negative value of course)
+     * e » Ending Delimiter
+     *
+     * The strategy for obtaining [NUMBER] is done by discovering the position of 'e' and obtaining the substring
+     * between 'i' and 'e'. After this is done, the pointer (defined by $this->position) is set to the char after the
+     * ending delimiter.
+     *
+     * @return BencodedInteger An integer object.
      */
     private function readInteger() : BencodedInteger
     {
@@ -104,7 +142,22 @@ class Bencode
     }
 
     /**
-     * @return BencodedString
+     * Process a string. Strings are the default data type in a way i.e. if the char is not the START DELIMITER of a
+     * Dictionary (d), List (l) or Integer (i) then it's for sure a string.
+     *
+     * The format of a string data type is: [LENGTH]:[STRING].
+     *
+     * [LENGTH] » The length of the string we will find
+     * : » The separator between the length and the actual string
+     * [STRING] » The string that was bencoded
+     *
+     * The strategy for discovering [STRING] is to discover the position of ':' and obtain the substring between
+     * $this->position and the position of ':'. This will give us the length of the string. After we will need to
+     * obtain the substring between the positon of ':' (+1 of course) plus the length that we previously discovered.
+     *
+     * After this is done, the pointer (defined by $this->position) is set to the char the length of the string.
+     *
+     * @return BencodedString A string object.
      */
     private function readString() : BencodedString
     {
@@ -119,7 +172,19 @@ class Bencode
     }
 
     /**
-     * @return BencodedDictionary
+     * Process a dictionary.
+     *
+     * The format of the dictionary data type is: d[OTHER DATA TYPES]e
+     *
+     * d » The starting delimiter.
+     * [OTHER DATA TYPES] » A dictionary can contain multiple other data types.
+     * e » The ending delimiter.
+     *
+     * The strategy for discovering [OTHER DATA TYPES] is by performing more recursive calls to search for the other
+     * data types in the dictionary until 'e' is found to finish off the dictionary. The dictionary composed by a key
+     * and a value so every two datatypes found we have a Key » Value pair.
+     *
+     * @return BencodedDictionary A dictionary object.
      */
     private function readDictionary() : BencodedDictionary
     {
@@ -143,7 +208,17 @@ class Bencode
     }
 
     /**
-     * @return BencodedList
+     * Process a list.
+     *
+     * A list is very similar to a dictionary but its values are not Key » Value pairs. It can, however, contain other
+     * dictionaries and lists.
+     *
+     * The format of a list of the following: l[OTHER DATA TYPES]e
+     *
+     * The strategy for discovering [OTHER DATA TYPES] is by performing more recursive calls to search for the other
+     * data types in the list until 'e' is found.
+     *
+     * @return BencodedList A list object.
      */
     private function readList() : BencodedList
     {
