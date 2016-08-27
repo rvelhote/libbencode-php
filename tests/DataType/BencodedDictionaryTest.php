@@ -25,7 +25,7 @@
 namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Bencode;
+use Welhott\Bencode\Decode;
 use Welhott\Bencode\DataType\BencodedInteger;
 
 /**
@@ -40,7 +40,7 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
             'pretzels' => new BencodedInteger(-100)
         ];
 
-        $bencoded = new Bencode('d8:pretzelsi-100ei1ee');
+        $bencoded = new Decode('d8:pretzelsi-100ei1ee');
         $decoded = $bencoded->decode();
 
         $this->assertEquals($expected, $decoded->getValue());

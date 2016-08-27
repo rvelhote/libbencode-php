@@ -34,7 +34,7 @@ use Welhott\Bencode\DataType\BencodedString;
  * Class Bencode
  * @package Welhott\Bencode
  */
-class Bencode
+class Decode
 {
     /**
      * The string/file contents of what we want to decode.

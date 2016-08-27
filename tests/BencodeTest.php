@@ -25,14 +25,14 @@
 namespace Welhott\Bencode\Tests;
 
 use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Bencode;
+use Welhott\Bencode\Decode;
 
 class BencodeTest extends PHPUnit_Framework_TestCase
 {
     public function testBencode()
     {
         $content = 'd8:announce23:http://torrent.tracker17:comment7:Comment10:created by25:Transmission/2.82 (14160)13:creation datei1471991229e8:encoding5:UTF-84:infod6:lengthi9e4:name11:torrent.txt12:piece lengthi32768e6:pieces1:X7:privatei1eee';
-        $bencoded = new Bencode($content);
+        $bencoded = new Decode($content);
         $decoded = $bencoded->decode();
 
         $this->assertEquals($decoded['announce']->getUrlParts(), 'http://torrent.tracker1');

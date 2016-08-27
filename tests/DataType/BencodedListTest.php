@@ -25,7 +25,7 @@
 namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Bencode;
+use Welhott\Bencode\Decode;
 use Welhott\Bencode\DataType\BencodedInteger;
 use Welhott\Bencode\DataType\BencodedString;
 
@@ -43,7 +43,7 @@ class BencodedListTest extends PHPUnit_Framework_TestCase
             new BencodedString('pretzels')
         ];
 
-        $bencoded = new Bencode('li-100ei1e8:pretzelse');
+        $bencoded = new Decode('li-100ei1e8:pretzelse');
         $decoded = $bencoded->decode();
 
         $this->assertEquals($expected, $decoded->getValue());

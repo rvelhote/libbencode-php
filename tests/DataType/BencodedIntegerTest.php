@@ -25,7 +25,7 @@
 namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Bencode;
+use Welhott\Bencode\Decode;
 use Welhott\Bencode\DataType\BencodedInteger;
 
 /**
@@ -40,7 +40,7 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
     public function testInteger()
     {
         for ($i = -1; $i < 1; $i++) {
-            $bencoded = new Bencode('i' . $i . 'e');
+            $bencoded = new Decode('i' . $i . 'e');
             $this->assertEquals($i, $bencoded->decode()->getValue());
         }
     }
@@ -50,7 +50,7 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
      */
     public function testMultipleIntegers()
     {
-        $bencoded = new Bencode('i-1ei1e');
+        $bencoded = new Decode('i-1ei1e');
         $this->assertEquals([new BencodedInteger(-1), new BencodedInteger(1)], $bencoded->decode());
     }
 
@@ -62,7 +62,7 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
         $time1 = time();
         $time2 = time() * time();
 
-        $bencoded = new Bencode('i' . $time1 . 'ei' . $time2 . 'e');
+        $bencoded = new Decode('i' . $time1 . 'ei' . $time2 . 'e');
         $this->assertEquals([new BencodedInteger($time1), new BencodedInteger($time2)], $bencoded->decode());
     }
 }
