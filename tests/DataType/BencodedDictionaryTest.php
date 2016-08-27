@@ -40,7 +40,7 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
             'pretzels' => new BencodedInteger(-100)
         ];
 
-        $bencoded = new Decode('d8:pretzelsi-100ei1ee');
+        $bencoded = new Decode('d8:pretzelsi-100ee');
         $decoded = $bencoded->decode();
 
         $this->assertEquals($expected, $decoded->getValue());
