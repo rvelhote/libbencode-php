@@ -25,7 +25,9 @@
 namespace Welhott\Bencode\Tests;
 
 use PHPUnit_Framework_TestCase;
+use Welhott\Bencode\DataType\BencodedDataType;
 use Welhott\Bencode\Decode;
+use Welhott\Bencode\Encode;
 
 class BencodeTest extends PHPUnit_Framework_TestCase
 {
@@ -33,9 +35,22 @@ class BencodeTest extends PHPUnit_Framework_TestCase
     {
         $content = 'd8:announce23:http://torrent.tracker17:comment7:Comment10:created by25:Transmission/2.82 (14160)13:creation datei1471991229e8:encoding5:UTF-84:infod6:lengthi9e4:name11:torrent.txt12:piece lengthi32768e6:pieces1:X7:privatei1eee';
         $bencoded = new Decode($content);
+
+        /** @var BencodedDataType[] $decoded */
         $decoded = $bencoded->decode();
 
-        $this->assertEquals($decoded['announce']->getUrlParts(), 'http://torrent.tracker1');
+        $this->assertEquals($decoded['announce']->getValue(), 'http://torrent.tracker1');
         $this->assertEquals($decoded['comment']->getValue(), 'Comment');
+    }
+
+    public function testEncode()
+    {
+        $dataset = [time(), 'String', ['ListItem1', 'ListItem2'], ['Key1' => 'Value1', 'Key2' => 'Value2']];
+
+        $bencode = new Encode($dataset);
+        $bencoded = $bencode->encode();
+
+        $bdecode = new Decode($bencoded);
+        $bdecoded = $bdecode->decode();
     }
 }
