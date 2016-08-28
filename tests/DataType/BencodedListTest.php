@@ -52,4 +52,12 @@ class BencodedListTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($expected[$index], $decoded[$index]);
         }
     }
+
+    public function testMissingEndDelimiter()
+    {
+        $this->expectException('\\Welhott\\Bencode\\Exception\\TokenNotFoundException');
+
+        $bencoded = new Decode('li-100ei1e8:pretzels');
+        $bencoded->decode();
+    }
 }

@@ -49,4 +49,20 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(isset($decoded['pretzels']));
         $this->assertFalse(isset($decoded['unset pretzels']));
     }
+
+    public function testMissingEndDelimiter()
+    {
+        $this->expectException('\\Welhott\\Bencode\\Exception\\TokenNotFoundException');
+
+        $bencoded = new Decode('d8:pretzelsi-100e');
+        $bencoded->decode();
+    }
+
+    public function testUnevenDataset()
+    {
+        $this->expectException('\\Welhott\\Bencode\\Exception\\BadDataException');
+
+        $bencoded = new Decode('d8:pretzelse');
+        $bencoded->decode();
+    }
 }
