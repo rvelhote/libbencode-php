@@ -57,24 +57,20 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException TokenNotFoundException
+     * @expectedException \Welhott\Bencode\Exception\TokenNotFoundException
      */
     public function testMissingEndDelimiter()
     {
-        $this->expectException('\\Welhott\\Bencode\\Exception\\TokenNotFoundException');
-
         $bencoded = new Decode('d8:pretzelsi-100e');
         $bencoded->decode();
     }
 
     /**
      * @test
-     * @expectedException BadDataException
+     * @expectedException \Welhott\Bencode\Exception\BadDataException
      */
     public function testUnevenDataset()
     {
-        $this->expectException('\\Welhott\\Bencode\\Exception\\BadDataException');
-
         $bencoded = new Decode('d8:pretzelse');
         $bencoded->decode();
     }
@@ -82,12 +78,10 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
     /**
      * Dictionary keys can only be strings or integers.
      * @test
-     * @expectedException BadDataException
+     * @expectedException \Welhott\Bencode\Exception\BadDataException
      */
     public function testDictionaryKeyNotString()
     {
-        $this->expectException('\\Welhott\\Bencode\\Exception\\BadDataException');
-
         $bencoded = new Decode('dl8:pretzelsei-100ee');
         $bencoded->decode();
     }
