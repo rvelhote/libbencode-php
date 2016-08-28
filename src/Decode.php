@@ -24,7 +24,6 @@
  */
 namespace Welhott\Bencode;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Welhott\Bencode\DataType\BencodedDataType;
 use Welhott\Bencode\DataType\BencodedDictionary;
 use Welhott\Bencode\DataType\BencodedInteger;
@@ -243,7 +242,8 @@ class Decode
 
             if ($this->position >= $this->length
                 && (!isset($this->bencoded[$this->position])
-                    || $this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER)) {
+                    || $this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER)
+            ) {
                 $message = sprintf('End of data reached. Ending delimiter for dictionary data type not found.');
                 throw new TokenNotFoundException($message);
             }
@@ -282,7 +282,8 @@ class Decode
 
             if ($this->position >= $this->length
                 && (!isset($this->bencoded[$this->position])
-                || $this->bencoded[$this->position] != BencodedList::END_DELIMITER)) {
+                    || $this->bencoded[$this->position] != BencodedList::END_DELIMITER)
+            ) {
                 $message = sprintf('End of data reached. Ending delimiter for list data type not found.');
                 throw new TokenNotFoundException($message);
             }

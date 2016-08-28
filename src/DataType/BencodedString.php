@@ -57,6 +57,9 @@ class BencodedString implements BencodedDataType
         return $this->value;
     }
 
+    /**
+     * @return array
+     */
     public function getUrlParts() : array
     {
         return parse_url($this->value);

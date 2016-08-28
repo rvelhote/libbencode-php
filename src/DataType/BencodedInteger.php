@@ -86,7 +86,7 @@ class BencodedInteger implements BencodedDataType
     public function getHumanFilesize(int $decimals = 2) : string
     {
         $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
-        $factor = floor((strlen($this->value) - 1) / 3);
+        $factor = intval(floor((strlen($this->value) - 1) / 3));
         return sprintf("%.{$decimals}f", $this->value / pow(1024, $factor)) . $size[$factor];
     }
 }
