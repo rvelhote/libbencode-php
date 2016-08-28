@@ -24,11 +24,14 @@
  */
 namespace Welhott\Bencode;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Welhott\Bencode\DataType\BencodedDataType;
 use Welhott\Bencode\DataType\BencodedDictionary;
 use Welhott\Bencode\DataType\BencodedInteger;
 use Welhott\Bencode\DataType\BencodedList;
 use Welhott\Bencode\DataType\BencodedString;
+use Welhott\Bencode\Exception\BadDataException;
+use Welhott\Bencode\Exception\TokenNotFoundException;
 
 /**
  * Class Bencode
@@ -129,16 +132,30 @@ class Decode
      * ending delimiter.
      *
      * @return BencodedInteger An integer object.
+     *
+     * @throws BadDataException
+     * @throws TokenNotFoundException
      */
     private function readInteger() : BencodedInteger
     {
         $this->position++;
 
         $token = mb_strpos($this->bencoded, BencodedInteger::END_DELIMITER, $this->position);
-        $string = mb_substr($this->bencoded, $this->position, $token - $this->position);
+
+        if ($token === false) {
+            $message = sprintf('Token \'%s\' not found while parsing Integer value', BencodedInteger::END_DELIMITER);
+            throw new TokenNotFoundException($message);
+        }
+
+        $integer = mb_substr($this->bencoded, $this->position, $token - $this->position);
+
+        if (!is_numeric($integer)) {
+            $message = sprintf('Integer \'%s\' is not a numeric value. Integers must be numeric.', $integer);
+            throw new BadDataException($message);
+        }
 
         $this->position = $token + 1;
-        return new BencodedInteger($string);
+        return new BencodedInteger($integer);
     }
 
     /**
@@ -158,16 +175,30 @@ class Decode
      * After this is done, the pointer (defined by $this->position) is set to the char the length of the string.
      *
      * @return BencodedString A string object.
+     * @throws BadDataException
+     * @throws TokenNotFoundException
      */
     private function readString() : BencodedString
     {
         $token = mb_strpos($this->bencoded, BencodedString::END_DELIMITER, $this->position);
+
+        if ($token === false) {
+            $message = sprintf('Token \'%s\' not found while parsing String value', BencodedString::END_DELIMITER);
+            throw new TokenNotFoundException($message);
+        }
+
         $length = mb_substr($this->bencoded, $this->position, $token - $this->position);
 
         $token++;
         $this->position = $length + $token;
 
         $string = mb_substr($this->bencoded, $token, $length);
+
+        if (mb_strlen($string) != $length) {
+            $message = sprintf('Length of string %d does not match expected length of %d', mb_strlen($string), $length);
+            throw new BadDataException($message);
+        }
+
         return new BencodedString($string);
     }
 
@@ -185,6 +216,7 @@ class Decode
      * and a value so every two datatypes found we have a Key » Value pair.
      *
      * @return BencodedDictionary A dictionary object.
+     * @throws BadDataException
      */
     private function readDictionary() : BencodedDictionary
     {
@@ -197,10 +229,28 @@ class Decode
         while ($this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER) {
             if ($zebra % 2 == 0) {
                 $key = $this->recursive()->getValue();
+
+                if (!is_string($key)) {
+                    $message = sprintf('Dictionary keys must be a string. This is is an \'%s\'', gettype($key));
+                    throw new BadDataException($message);
+                }
             } else {
                 $data[$key] = $this->recursive();
             }
+
             $zebra++;
+
+            if ($this->position >= $this->length
+                && (!isset($this->bencoded[$this->position])
+                    || $this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER)) {
+                $message = sprintf('End of data reached. Ending delimiter for dictionary data type not found.');
+                throw new TokenNotFoundException($message);
+            }
+        }
+
+        if ($zebra % 2 !== 0) {
+            $message = sprintf('The dictionary contains \'%d\' value. It must be an even value', $zebra);
+            throw new BadDataException($message);
         }
 
         $this->position++;
@@ -219,6 +269,7 @@ class Decode
      * data types in the list until 'e' is found.
      *
      * @return BencodedList A list object.
+     * @throws TokenNotFoundException
      */
     private function readList() : BencodedList
     {
@@ -227,6 +278,13 @@ class Decode
 
         while ($this->bencoded[$this->position] != BencodedList::END_DELIMITER) {
             $list[] = $this->recursive();
+
+            if ($this->position >= $this->length
+                && (!isset($this->bencoded[$this->position])
+                || $this->bencoded[$this->position] != BencodedList::END_DELIMITER)) {
+                $message = sprintf('End of data reached. Ending delimiter for list data type not found.');
+                throw new TokenNotFoundException($message);
+            }
         }
 
         $this->position++;
