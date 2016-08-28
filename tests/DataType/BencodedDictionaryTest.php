@@ -27,6 +27,8 @@ namespace Welhott\Bencode\Tests\DataType;
 use PHPUnit_Framework_TestCase;
 use Welhott\Bencode\Decode;
 use Welhott\Bencode\DataType\BencodedInteger;
+use Welhott\Bencode\Exception\BadDataException;
+use Welhott\Bencode\Exception\TokenNotFoundException;
 
 /**
  * Class BencodedDictionaryTest
@@ -34,6 +36,9 @@ use Welhott\Bencode\DataType\BencodedInteger;
  */
 class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @test
+     */
     public function testDictionary()
     {
         $expected = [
@@ -50,6 +55,10 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(isset($decoded['unset pretzels']));
     }
 
+    /**
+     * @test
+     * @expectedException TokenNotFoundException
+     */
     public function testMissingEndDelimiter()
     {
         $this->expectException('\\Welhott\\Bencode\\Exception\\TokenNotFoundException');
@@ -58,11 +67,28 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
         $bencoded->decode();
     }
 
+    /**
+     * @test
+     * @expectedException BadDataException
+     */
     public function testUnevenDataset()
     {
         $this->expectException('\\Welhott\\Bencode\\Exception\\BadDataException');
 
         $bencoded = new Decode('d8:pretzelse');
+        $bencoded->decode();
+    }
+
+    /**
+     * Dictionary keys can only be strings or integers.
+     * @test
+     * @expectedException BadDataException
+     */
+    public function testDictionaryKeyNotString()
+    {
+        $this->expectException('\\Welhott\\Bencode\\Exception\\BadDataException');
+
+        $bencoded = new Decode('dl8:pretzelsei-100ee');
         $bencoded->decode();
     }
 }
