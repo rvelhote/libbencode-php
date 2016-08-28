@@ -25,8 +25,8 @@
 namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Decode;
 use Welhott\Bencode\DataType\BencodedInteger;
+use Welhott\Bencode\Decode;
 
 /**
  * Class BencodedIntegerTest
@@ -64,5 +64,25 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
 
         $bencoded = new Decode('i' . $time1 . 'ei' . $time2 . 'e');
         $this->assertEquals([new BencodedInteger($time1), new BencodedInteger($time2)], $bencoded->decode());
+    }
+
+    /**
+     * @test
+     * @expectedException \Welhott\Bencode\Exception\TokenNotFoundException
+     */
+    public function testMissingEndDelimiter()
+    {
+        $bencoded = new Decode('i' . time());
+        $bencoded->decode();
+    }
+
+    /**
+     * @test
+     * @expectedException \Welhott\Bencode\Exception\BadDataException
+     */
+    public function testNonNumericContent()
+    {
+        $bencoded = new Decode('ipretzelse');
+        $bencoded->decode();
     }
 }
