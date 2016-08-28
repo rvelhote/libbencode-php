@@ -41,6 +41,9 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
         'another babka?'
     ];
 
+    /**
+     * @test
+     */
     public function testSingleByteString()
     {
         foreach (self::$strings as $string) {
@@ -49,6 +52,9 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @test
+     */
     public function testMultipleByteStrings()
     {
         $concatenated = '';
@@ -65,5 +71,31 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
         foreach ($bencodedData as $i => $data) {
             $this->assertEquals(self::$strings[$i], $data->getValue());
         }
+    }
+
+    /**
+     * @test
+     * @expectedException \Welhott\Bencode\Exception\TokenNotFoundException
+     */
+    public function testMissingStringDelimiter()
+    {
+        $string = 'these pretzels are making me thirsty';
+        $string = mb_strlen($string).$string;
+
+        $bencoded = new Decode($string);
+        $bencoded->decode();
+    }
+
+    /**
+     * @test
+     * @expectedException \Welhott\Bencode\Exception\BadDataException
+     */
+    public function testBadLength()
+    {
+        $string = 'these pretzels are making me thirsty';
+        $string = (mb_strlen($string) + 1).':'.$string;
+
+        $bencoded = new Decode($string);
+        $bencoded->decode();
     }
 }
