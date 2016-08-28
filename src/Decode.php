@@ -217,6 +217,7 @@ class Decode
      *
      * @return BencodedDictionary A dictionary object.
      * @throws BadDataException
+     * @throws TokenNotFoundException
      */
     private function readDictionary() : BencodedDictionary
     {
@@ -230,7 +231,7 @@ class Decode
             if ($zebra % 2 == 0) {
                 $key = $this->recursive()->getValue();
 
-                if (!is_string($key)) {
+                if (!is_string($key) && !is_numeric($key)) {
                     $message = sprintf('Dictionary keys must be a string. This is is an \'%s\'', gettype($key));
                     throw new BadDataException($message);
                 }
