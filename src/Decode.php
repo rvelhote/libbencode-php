@@ -268,6 +268,8 @@ class Decode
             throw new BadDataException($message);
         }
 
+        ksort($data, SORT_STRING);
+
         $this->position++;
         return new BencodedDictionary($data);
     }

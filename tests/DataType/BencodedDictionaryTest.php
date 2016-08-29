@@ -25,10 +25,8 @@
 namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\Decode;
 use Welhott\Bencode\DataType\BencodedInteger;
-use Welhott\Bencode\Exception\BadDataException;
-use Welhott\Bencode\Exception\TokenNotFoundException;
+use Welhott\Bencode\Decode;
 
 /**
  * Class BencodedDictionaryTest
@@ -95,5 +93,18 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
     {
         $bencoded = new Decode('d8:pretzelsi-100e8:pretzelsi-200ee');
         $bencoded->decode();
+    }
+
+    /**
+     * @test Dictionary keys must be ordered by string (not alphanumeric).
+     */
+    public function testKeyOrdering()
+    {
+        $bencoded = (new Decode('d4:Key2i-100e4:Key1i-200ee'))->decode();
+
+        $expectedOrder = ['Key1', 'Key2'];
+        $actualOrder = array_keys(iterator_to_array($bencoded));
+
+        $this->assertEquals($expectedOrder, $actualOrder);
     }
 }
