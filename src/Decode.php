@@ -245,6 +245,10 @@ class Decode
                     throw new BadDataException($message);
                 }
             } else {
+                if(isset($data[$key])) {
+                    $message = sprintf('Dictionaries cannot have duplicate keys. \'%s\' is duplicate', $key);
+                    throw new BadDataException($message);
+                }
                 $data[$key] = $this->recursive();
             }
 

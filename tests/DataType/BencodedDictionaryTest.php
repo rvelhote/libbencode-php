@@ -85,4 +85,15 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
         $bencoded = new Decode('dl8:pretzelsei-100ee');
         $bencoded->decode();
     }
+
+    /**
+     * @test Dictionaries cannot have repeated keys
+     * @expectedException \Welhott\Bencode\Exception\BadDataException
+     * @expectedExceptionMessage Dictionaries cannot have duplicate keys.
+     */
+    public function testDuplicateKey()
+    {
+        $bencoded = new Decode('d8:pretzelsi-100e8:pretzelsi-200ee');
+        $bencoded->decode();
+    }
 }
