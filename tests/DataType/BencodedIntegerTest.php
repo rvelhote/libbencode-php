@@ -39,7 +39,7 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
      */
     public function testInteger()
     {
-        for ($i = -1; $i < 1; $i++) {
+        for ($i = -10; $i < 10; $i++) {
             $bencoded = new Decode('i' . $i . 'e');
             $this->assertEquals($i, $bencoded->decode()->getValue());
         }
@@ -79,10 +79,42 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \Welhott\Bencode\Exception\BadDataException
+     * @expectedExceptionMessage Integers must be numeric
      */
     public function testNonNumericContent()
     {
         $bencoded = new Decode('ipretzelse');
+        $bencoded->decode();
+    }
+
+    /**
+     * @test Confirm that a single zero is parsed correctly.
+     */
+    public function testZero()
+    {
+        $bencoded = new Decode('i0e');
+        $this->assertEquals(0, $bencoded->decode()->getValue());
+    }
+
+    /**
+     * @test Integers cannot have leading zeroes.
+     * @expectedException \Welhott\Bencode\Exception\BadDataException
+     * @expectedExceptionMessage Integers cannot have leading zeroes
+     */
+    public function testLeadingZeroes()
+    {
+        $bencoded = new Decode('i00e');
+        $bencoded->decode();
+    }
+
+    /**
+     * @test The beencoded string i-0e is not valid according to the specification
+     * @expectedException \Welhott\Bencode\Exception\BadDataException
+     * @expectedExceptionMessage Having -0 in a bencoded integer is not valid.
+     */
+    public function testMinusZero()
+    {
+        $bencoded = new Decode('i-00000e');
         $bencoded->decode();
     }
 }

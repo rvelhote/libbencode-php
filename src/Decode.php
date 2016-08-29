@@ -148,6 +148,16 @@ class Decode
 
         $integer = mb_substr($this->bencoded, $this->position, $token - $this->position);
 
+        if(mb_strlen($integer) > 1 && $integer[0] == '0') {
+            $message = sprintf('Integers cannot have leading zeroes. \'%s\' starts with zero.', $integer);
+            throw new BadDataException($message);
+        }
+
+        if(intval($integer) === 0 && $integer[0] == '-') {
+            $message = sprintf('Having -0 in a bencoded integer is not valid. You have %s', $integer);
+            throw new BadDataException($message);
+        }
+
         if (!is_numeric($integer)) {
             $message = sprintf('Integer \'%s\' is not a numeric value. Integers must be numeric.', $integer);
             throw new BadDataException($message);
