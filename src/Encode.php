@@ -121,6 +121,8 @@ class Encode
     {
         $list = '';
 
+        ksort($data, SORT_STRING);
+
         foreach($data as $key => $value) {
             $list .= ($this->createString($key).$this->recursive($value));
         }
