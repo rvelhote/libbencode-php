@@ -240,7 +240,7 @@ class Decode
             if ($zebra % 2 == 0) {
                 $key = $this->recursive()->getValue();
 
-                if (!is_string($key) && !is_numeric($key)) {
+                if (!is_string($key)) {
                     $message = sprintf('Dictionary keys must be a string. This is is an \'%s\'', gettype($key));
                     throw new BadDataException($message);
                 }
