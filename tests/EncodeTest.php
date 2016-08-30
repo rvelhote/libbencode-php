@@ -60,6 +60,6 @@ class EncodeTest extends PHPUnit_Framework_TestCase
         $bdecode = new Decode($bencoded);
         $bdecoded = $bdecode->decode();
 
-        $this->assertEquals($expected, $bdecoded);exit;
+        $this->assertEquals($expected, $bdecoded);
     }
 }
