@@ -38,7 +38,7 @@ class Encode
     /**
      * @var array
      */
-    public $data;
+    private $data;
 
     /**
      * Encode constructor.
@@ -67,7 +67,7 @@ class Encode
      * @param $data
      * @return string
      */
-    public function recursive($data) : string
+    private function recursive($data) : string
     {
         if(is_int($data)) {
             return $this->createInteger($data);
@@ -84,7 +84,7 @@ class Encode
      * @param int $data
      * @return string
      */
-    public function createInteger(int $data) : string
+    private function createInteger(int $data) : string
     {
         return BencodedInteger::START_DELIMITER.$data.BencodedInteger::END_DELIMITER;
     }
@@ -93,7 +93,7 @@ class Encode
      * @param string $data
      * @return string
      */
-    public function createString(string $data) : string
+    private function createString(string $data) : string
     {
         return mb_strlen($data).BencodedString::END_DELIMITER.$data;
     }
@@ -102,7 +102,7 @@ class Encode
      * @param array $data
      * @return string
      */
-    public function createList(array $data) : string
+    private function createList(array $data) : string
     {
         $list = '';
 
@@ -117,7 +117,7 @@ class Encode
      * @param array $data
      * @return string
      */
-    public function createDictionary(array $data) : string
+    private function createDictionary(array $data) : string
     {
         $list = '';
 
