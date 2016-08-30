@@ -25,20 +25,41 @@
 namespace Welhott\Bencode\Tests;
 
 use PHPUnit_Framework_TestCase;
-use Welhott\Bencode\DataType\BencodedDataType;
+use Welhott\Bencode\DataType\BencodedDictionary;
+use Welhott\Bencode\DataType\BencodedInteger;
+use Welhott\Bencode\DataType\BencodedList;
+use Welhott\Bencode\DataType\BencodedString;
 use Welhott\Bencode\Decode;
+use Welhott\Bencode\Encode;
 
-class BencodeTest extends PHPUnit_Framework_TestCase
+/**
+ * Class EncodeTest
+ * @package Welhott\Bencode\Tests
+ */
+class EncodeTest extends PHPUnit_Framework_TestCase
 {
-    public function testBencode()
+    /**
+     * This test will encode the dataset and decode it to make sure the result if equal to the initial state.
+     * @test Make sure the encoding has the expected format.
+     */
+    public function testEncoding()
     {
-        $content = 'd8:announce23:http://torrent.tracker17:comment7:Comment10:created by25:Transmission/2.82 (14160)13:creation datei1471991229e8:encoding5:UTF-84:infod6:lengthi9e4:name11:torrent.txt12:piece lengthi32768e6:pieces1:X7:privatei1eee';
-        $bencoded = new Decode($content);
+        $expected = [
+            new BencodedInteger(time()),
+            new BencodedString('String'),
+            new BencodedList([new BencodedString('ListItem1'), new BencodedString('ListItem2')]),
+            new BencodedDictionary([
+                'Key1' => new BencodedString('Value1'),
+                'Key2' => new BencodedString('Value2')
+            ]),
+        ];
 
-        /** @var BencodedDataType[] $decoded */
-        $decoded = $bencoded->decode();
+        $bencode = new Encode($expected);
+        $bencoded = $bencode->encode();
 
-        $this->assertEquals($decoded['announce']->value(), 'http://torrent.tracker1');
-        $this->assertEquals($decoded['comment']->value(), 'Comment');
+        $bdecode = new Decode($bencoded);
+        $bdecoded = $bdecode->decode();
+
+        $this->assertEquals($expected, $bdecoded);exit;
     }
 }
