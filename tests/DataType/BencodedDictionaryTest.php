@@ -25,6 +25,7 @@
 namespace Welhott\Bencode\Tests\DataType;
 
 use PHPUnit_Framework_TestCase;
+use Welhott\Bencode\DataType\BencodedDataType;
 use Welhott\Bencode\DataType\BencodedInteger;
 use Welhott\Bencode\Decode;
 
@@ -106,5 +107,25 @@ class BencodedDictionaryTest extends PHPUnit_Framework_TestCase
         $actualOrder = array_keys(iterator_to_array($bencoded));
 
         $this->assertEquals($expectedOrder, $actualOrder);
+    }
+
+    /**
+     * @test Make sure that nested dictionaries work and can be accessed as an array
+     */
+    public function testNestedDictionary()
+    {
+        $bencoded = (new Decode('d4:Key1d4:Key2i200eee'))->decode();
+
+        /** @var BencodedDataType[] $dictionary */
+        $dictionary = $bencoded->value();
+        $this->assertEquals(200, $dictionary['Key1']['Key2']->value());
+
+        $bencoded = (new Decode('d4:Key1d4:Key2d4:Key3i200eeee'))->decode();
+        $dictionary = $bencoded->value();
+        $this->assertEquals(200, $dictionary['Key1']['Key2']['Key3']->value());
+
+        $bencoded = (new Decode('d4:Key1d4:Key2d4:Key3d4:Key4i200eeeee'))->decode();
+        $dictionary = $bencoded->value();
+        $this->assertEquals(200, $dictionary['Key1']['Key2']['Key3']['Key4']->value());
     }
 }
