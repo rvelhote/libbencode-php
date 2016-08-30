@@ -60,7 +60,7 @@ class BencodedInteger implements BencodedDataType
      * The integer value of this object.
      * @return int An integer.
      */
-    public function getValue() : int
+    public function value() : int
     {
         return $this->value;
     }

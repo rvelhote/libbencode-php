@@ -52,7 +52,7 @@ class BencodedString implements BencodedDataType
     /**
      * @return string
      */
-    public function getValue() : string
+    public function value() : string
     {
         return $this->value;
     }

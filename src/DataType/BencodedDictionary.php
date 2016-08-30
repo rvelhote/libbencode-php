@@ -62,7 +62,7 @@ class BencodedDictionary implements BencodedDataType, ArrayAccess, IteratorAggre
     /**
      * @return array
      */
-    public function getValue() : array
+    public function value() : array
     {
         return $this->value;
     }

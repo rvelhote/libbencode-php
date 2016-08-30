@@ -62,7 +62,7 @@ class BencodedList implements BencodedDataType, ArrayAccess, IteratorAggregate
     /**
      * @return array
      */
-    public function getValue() : array
+    public function value() : array
     {
         return $this->value;
     }

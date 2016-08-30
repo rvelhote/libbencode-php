@@ -48,7 +48,7 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
     {
         foreach (self::$strings as $string) {
             $bencoded = new Decode(mb_strlen($string) . ':' . $string);
-            $this->assertEquals($string, $bencoded->decode()->getValue());
+            $this->assertEquals($string, $bencoded->decode()->value());
         }
     }
 
@@ -69,7 +69,7 @@ class BencodedStringTest extends PHPUnit_Framework_TestCase
 
         /** @var BencodedDataType $data */
         foreach ($bencodedData as $i => $data) {
-            $this->assertEquals(self::$strings[$i], $data->getValue());
+            $this->assertEquals(self::$strings[$i], $data->value());
         }
     }
 

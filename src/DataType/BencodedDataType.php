@@ -26,5 +26,5 @@ namespace Welhott\Bencode\DataType;
 
 interface BencodedDataType
 {
-    public function getValue();
+    public function value();
 }

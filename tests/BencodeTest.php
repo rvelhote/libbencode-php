@@ -39,8 +39,8 @@ class BencodeTest extends PHPUnit_Framework_TestCase
         /** @var BencodedDataType[] $decoded */
         $decoded = $bencoded->decode();
 
-        $this->assertEquals($decoded['announce']->getValue(), 'http://torrent.tracker1');
-        $this->assertEquals($decoded['comment']->getValue(), 'Comment');
+        $this->assertEquals($decoded['announce']->value(), 'http://torrent.tracker1');
+        $this->assertEquals($decoded['comment']->value(), 'Comment');
     }
 
     public function testEncode()
@@ -52,5 +52,7 @@ class BencodeTest extends PHPUnit_Framework_TestCase
 
         $bdecode = new Decode($bencoded);
         $bdecoded = $bdecode->decode();
+
+//        var_dump($bdecoded);
     }
 }

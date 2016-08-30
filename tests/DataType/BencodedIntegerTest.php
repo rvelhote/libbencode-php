@@ -41,7 +41,7 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
     {
         for ($i = -10; $i < 10; $i++) {
             $bencoded = new Decode('i' . $i . 'e');
-            $this->assertEquals($i, $bencoded->decode()->getValue());
+            $this->assertEquals($i, $bencoded->decode()->value());
         }
     }
 
@@ -93,7 +93,7 @@ class BencodedIntegerTest extends PHPUnit_Framework_TestCase
     public function testZero()
     {
         $bencoded = new Decode('i0e');
-        $this->assertEquals(0, $bencoded->decode()->getValue());
+        $this->assertEquals(0, $bencoded->decode()->value());
     }
 
     /**

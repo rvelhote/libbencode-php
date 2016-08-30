@@ -238,7 +238,7 @@ class Decode
 
         while ($this->bencoded[$this->position] != BencodedDictionary::END_DELIMITER) {
             if ($zebra % 2 == 0) {
-                $key = $this->recursive()->getValue();
+                $key = $this->recursive()->value();
 
                 if (!is_string($key)) {
                     $message = sprintf('Dictionary keys must be a string. This is is an \'%s\'', gettype($key));
