@@ -36,36 +36,64 @@ use Welhott\Bencode\DataType\BencodedString;
 class Encode
 {
     /**
+     * The raw array with the data the user wants to encode.
      * @var array
      */
-    private $data;
+    private $raw = [];
+
+    /**
+     * The final Bencoded string will be stored for reuse here.
+     * @var string
+     */
+    private $bencoded = '';
 
     /**
      * Encode constructor.
-     * @param array $data
+     * @param array $raw
      */
-    public function __construct(array $data)
+    public function __construct(array $raw)
     {
-        $this->data = $data;
+        $this->raw = $raw;
     }
 
     /**
-     * @return string
+     * Returns the raw array dataset that will be encoded.
+     * @return array The raw array.
+     */
+    public function getRawData() : array
+    {
+        return $this->raw;
+    }
+
+    /**
+     * Returns the already bencoded string (it does not reencode).
+     * @return string The Bencoded string.
+     */
+    public function getEncodedData() : string
+    {
+        return $this->bencoded;
+    }
+
+    /**
+     * Recursively loop through the dataset and Bencode each item.
+     * @return string A Bencoded string representing the whole dataset.
      */
     public function encode() : string
     {
         $bencoded = '';
 
-        foreach($this->data as $data) {
+        foreach($this->raw as $data) {
             $bencoded .= $this->recursive($data);
         }
 
+        $this->bencoded = $bencoded;
         return $bencoded;
     }
 
     /**
-     * @param $data
-     * @return string
+     * Parses the current value of the dataset depending on its data type.
+     * @param mixed $data data that we want to analyize and encode.
+     * @return string The Bencoded data type in the correct format.
      */
     private function recursive($data) : string
     {
@@ -81,52 +109,80 @@ class Encode
     }
 
     /**
-     * @param int $data
-     * @return string
+     * Creates a bencoded integer.
+     * Integers have the following format: i[INT]e
+     *
+     * i » Start delimiter of an integer.
+     * [INT] » The integer that we want to represent.
+     * e » The end delimiter of the integer.
+     *
+     * @param int $integer The integer that we want to encode.
+     * @return string A Bencoded integer value as a string.
      */
-    private function createInteger(int $data) : string
+    private function createInteger(int $integer) : string
     {
-        return BencodedInteger::START_DELIMITER.$data.BencodedInteger::END_DELIMITER;
+        return BencodedInteger::START_DELIMITER.$integer.BencodedInteger::END_DELIMITER;
     }
 
     /**
-     * @param string $data
-     * @return string
+     * Creates a Bencoded string.
+     * String have the following format: 4:test
+     *
+     * 4 » The length of the string
+     * : » The string delimiter which splits the lenth and the actual contents
+     * [STRING] » A string with the same length as above.
+     *
+     * @param string $string The string we want to encode. Length is calculated automatically.
+     * @return string A Bencoded string value.
      */
-    private function createString(string $data) : string
+    private function createString(string $string) : string
     {
-        return mb_strlen($data).BencodedString::END_DELIMITER.$data;
+        return mb_strlen($string).BencodedString::END_DELIMITER.$string;
     }
 
     /**
-     * @param array $data
-     * @return string
+     * Creates a Bencoded list.
+     * Lists have the following format: l[... OTHER DATA TYPES ...]e
+     *
+     * l » Starting delimiter token
+     * A number of values in which the value can be an Integer, a String, a list or a dictionary.
+     * e » End delimiter token
+     *
+     * @param array $list An array of items that belong to the list we want to encode.
+     * @return string A Bencoded string representing the list.
      */
-    private function createList(array $data) : string
+    private function createList(array $list) : string
     {
-        $list = '';
+        $encodedList = '';
 
-        foreach($data as $value) {
-            $list .= $this->recursive($value);
+        foreach($list as $value) {
+            $encodedList .= $this->recursive($value);
         }
 
-        return BencodedList::START_DELIMITER.$list.BencodedList::END_DELIMITER;
+        return BencodedList::START_DELIMITER.$encodedList.BencodedList::END_DELIMITER;
     }
 
     /**
-     * @param array $data
-     * @return string
+     * Creates a Bencoded dictionary.
+     * Dictionaries have the following format: d[... OTHER DATA TYPES ...]e
+     *
+     * d » Starting delimiter token
+     * A number of Key-Value pairs in which the value can be an Integer, a String, a list or another dictionary.
+     * e » End delimiter token
+     *
+     * @param array $dictionary The array of the dictionary that we wish to encode.
+     * @return string The dictionary and it's key-value pairs of other data types.
      */
-    private function createDictionary(array $data) : string
+    private function createDictionary(array $dictionary) : string
     {
-        $list = '';
+        $encodedDictionary = '';
 
-        ksort($data, SORT_STRING);
+        ksort($dictionary, SORT_STRING);
 
-        foreach($data as $key => $value) {
-            $list .= ($this->createString($key).$this->recursive($value));
+        foreach($dictionary as $key => $value) {
+            $encodedDictionary .= ($this->createString($key).$this->recursive($value));
         }
 
-        return BencodedDictionary::START_DELIMITER.$list.BencodedDictionary::END_DELIMITER;
+        return BencodedDictionary::START_DELIMITER.$encodedDictionary.BencodedDictionary::END_DELIMITER;
     }
 }
