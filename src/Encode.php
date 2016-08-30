@@ -24,6 +24,7 @@
  */
 namespace Welhott\Bencode;
 
+use Welhott\Bencode\DataType\BencodedDataType;
 use Welhott\Bencode\DataType\BencodedDictionary;
 use Welhott\Bencode\DataType\BencodedInteger;
 use Welhott\Bencode\DataType\BencodedList;
@@ -95,16 +96,25 @@ class Encode
      * @param mixed $data data that we want to analyize and encode.
      * @return string The Bencoded data type in the correct format.
      */
-    private function recursive($data) : string
+    private function recursive(BencodedDataType $data) : string
     {
-        if(is_int($data)) {
-            return $this->createInteger($data);
-        } else if(is_string($data)) {
-            return $this->createString($data);
-        } else if(is_array($data) && isset($data[0])) {
-            return $this->createList($data);
-        } else {
-            return $this->createDictionary($data);
+        switch(get_class($data)) {
+            case 'Welhott\Bencode\DataType\BencodedInteger': {
+                return $this->createInteger($data);
+            }
+
+            case 'Welhott\Bencode\DataType\BencodedString': {
+                return $this->createString($data);
+            }
+
+            case 'Welhott\Bencode\DataType\BencodedList': {
+                return $this->createList($data);
+            }
+
+            case 'Welhott\Bencode\DataType\BencodedDictionary':
+            default: {
+                return $this->createDictionary($data);
+            }
         }
     }
 
@@ -116,12 +126,12 @@ class Encode
      * [INT] » The integer that we want to represent.
      * e » The end delimiter of the integer.
      *
-     * @param int $integer The integer that we want to encode.
+     * @param BencodedInteger $integer The integer that we want to encode.
      * @return string A Bencoded integer value as a string.
      */
-    private function createInteger(int $integer) : string
+    private function createInteger(BencodedInteger $integer) : string
     {
-        return BencodedInteger::START_DELIMITER.$integer.BencodedInteger::END_DELIMITER;
+        return BencodedInteger::START_DELIMITER.$integer->value().BencodedInteger::END_DELIMITER;
     }
 
     /**
@@ -132,12 +142,12 @@ class Encode
      * : » The string delimiter which splits the lenth and the actual contents
      * [STRING] » A string with the same length as above.
      *
-     * @param string $string The string we want to encode. Length is calculated automatically.
+     * @param BencodedString $string The string we want to encode. Length is calculated automatically.
      * @return string A Bencoded string value.
      */
-    private function createString(string $string) : string
+    private function createString(BencodedString $string) : string
     {
-        return mb_strlen($string).BencodedString::END_DELIMITER.$string;
+        return mb_strlen($string->value()).BencodedString::END_DELIMITER.$string->value();
     }
 
     /**
@@ -148,10 +158,10 @@ class Encode
      * A number of values in which the value can be an Integer, a String, a list or a dictionary.
      * e » End delimiter token
      *
-     * @param array $list An array of items that belong to the list we want to encode.
+     * @param BencodedList $list An array of items that belong to the list we want to encode.
      * @return string A Bencoded string representing the list.
      */
-    private function createList(array $list) : string
+    private function createList(BencodedList $list) : string
     {
         $encodedList = '';
 
@@ -170,17 +180,16 @@ class Encode
      * A number of Key-Value pairs in which the value can be an Integer, a String, a list or another dictionary.
      * e » End delimiter token
      *
-     * @param array $dictionary The array of the dictionary that we wish to encode.
+     * @param BencodedDictionary $dictionary The array of the dictionary that we wish to encode.
      * @return string The dictionary and it's key-value pairs of other data types.
      */
-    private function createDictionary(array $dictionary) : string
+    private function createDictionary(BencodedDictionary $dictionary) : string
     {
         $encodedDictionary = '';
 
-        ksort($dictionary, SORT_STRING);
-
+        $dictionary->sort();
         foreach($dictionary as $key => $value) {
-            $encodedDictionary .= ($this->createString($key).$this->recursive($value));
+            $encodedDictionary .= ($this->createString(new BencodedString($key)).$this->recursive($value));
         }
 
         return BencodedDictionary::START_DELIMITER.$encodedDictionary.BencodedDictionary::END_DELIMITER;
