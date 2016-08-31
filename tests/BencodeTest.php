@@ -24,6 +24,7 @@
  */
 namespace Welhott\Bencode\Tests;
 
+use DateTime;
 use PHPUnit_Framework_TestCase;
 use Welhott\Bencode\DataType\BencodedDataType;
 use Welhott\Bencode\Decode;
@@ -40,5 +41,13 @@ class BencodeTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($decoded['announce']->value(), 'http://torrent.tracker1');
         $this->assertEquals($decoded['comment']->value(), 'Comment');
+        $this->assertEquals($decoded['created by']->value(), 'Transmission/2.82 (14160)');
+        $this->assertEquals($decoded['creation date']->value(), 1471991229);
+        $this->assertEquals($decoded['creation date']->getDate(), new DateTime('@1471991229'));
+        $this->assertEquals($decoded['encoding']->value(), 'UTF-8');
+        $this->assertEquals($decoded['info']['length']->value(), 9);
+        $this->assertEquals($decoded['info']['name']->value(), 'torrent.txt');
+        $this->assertEquals($decoded['info']['piece length']->value(), 32768);
+        $this->assertEquals($decoded['info']['private']->value(), 1);
     }
 }
