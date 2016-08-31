@@ -71,7 +71,7 @@ class BencodedInteger implements BencodedDataType
      */
     public function getDate() : DateTime
     {
-        return new DateTime($this->value);
+        return new DateTime('@'.$this->value);
     }
 
     /**
